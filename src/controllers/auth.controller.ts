@@ -1,6 +1,7 @@
 import { Request, Response } from "express"; 
 import User from "../models/user.models";
 import { comparePassword, hashPoassword } from "../utils/bcrypt.utils";
+import CustomError from "../middlewares/error-handler.middleware";
 
 export const register = async (req: Request, res: Response) => {
     try {
@@ -55,15 +56,15 @@ export const login = async (req: Request, res: Response) => {
         const { email, password } = req.body
 
         if (!email || !password) {
-            throw new Error('email required');
+            throw new CustomError('email required',400);
         }  
         if (!password) {
-            throw new Error('password required'); 
+            throw new CustomError('password required',400); 
        }
         
          const user = await User.findOne({email})
         if (!user) { 
-              throw new Error('credentials does not match')
+              throw new CustomError('credentials does not match',400)
           }  
 
         const { password: userPass, ...userData } = user
@@ -71,9 +72,14 @@ export const login = async (req: Request, res: Response) => {
         const isPasswordMatch = await comparePassword(password, userPass)
 
         if (!isPasswordMatch) {
-            throw new Error('credentials does not match')
+            throw new CustomError('credentials does not match',400)
         }
           
+        //!generate token 
+        
+
+
+
         res.status(201).json({
             message: 'Login sucessful', 
             status: 'success', 
@@ -94,3 +100,5 @@ export const login = async (req: Request, res: Response) => {
     }
 
 }
+
+

@@ -1,11 +1,12 @@
 import 'dotenv/config'
 import express, { NextFunction, Request, Response } from 'express'
 import { connectDatabase } from './config/database.config'
-import { errorHandler } from './middlewares/error-handler.middleware'
+import  CustomError , { errorHandler } from './middlewares/error-handler.middleware'
 
 //importing routes
 import authRoutes from './routes/auth.routes'
 import userRoutes from './routes/user.routes'
+import PackageRoutes from'./routes/tour_package.routes'
 
 const PORT = process.env.PORT || 8080
 
@@ -38,14 +39,12 @@ app.get('/', (req, res) => {
 //using routes
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
+app.use('/api/tour_package',PackageRoutes)
 
  
 //fallback route
-app.all('/{*a}',(req: Request, res: Response, next: NextFunction) => {
-    const error: any = new Error('can not ${req.method} on $ {req.originalUrl')
-error.statusCode = 404
-    error.status = 'fail'
-    error.success = false 
+app.all('/{*a}', (req: Request, res: Response, next: NextFunction) => {
+    const error: any = new CustomError(`can not ${req.method} on $ {req.originalUrl}` , 404)
     next (error)
     
 })
