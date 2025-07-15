@@ -8,4 +8,7 @@ router.get('/', getAll)
 router.get('/:id',getBYId)
 router.put('/:id',update)
 router.delete('/:id',remove)
+
+
 export default router; 
+

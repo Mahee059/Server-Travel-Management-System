@@ -1,7 +1,8 @@
-import { Request, Response } from "express"; 
+import { NextFunction, Request, Response } from "express"; 
 import User from "../models/user.models";
 import { comparePassword, hashPoassword } from "../utils/bcrypt.utils";
 import CustomError from "../middlewares/error-handler.middleware";
+import { asyncHandler } from "../utils/async-handler.utils";
 
 export const register = async (req: Request, res: Response) => {
     try {
@@ -49,56 +50,49 @@ export const register = async (req: Request, res: Response) => {
 };
 
 
-export const login = async (req: Request, res: Response) => {
+export const login = asyncHandler(
+
+    async (req: Request, res: Response, next: NextFunction) => {
     
-    try {
+        try {
      
-        const { email, password } = req.body
+            const { email, password } = req.body
 
-        if (!email || !password) {
-            throw new CustomError('email required',400);
-        }  
-        if (!password) {
-            throw new CustomError('password required',400); 
-       }
+            if (!email || !password) {
+                throw new CustomError('email required', 400);
+            }
+            if (!password) {
+                throw new CustomError('password required', 400);
+            }
         
-         const user = await User.findOne({email})
-        if (!user) { 
-              throw new CustomError('credentials does not match',400)
-          }  
+            const user = await User.findOne({ email })
+            if (!user) {
+                throw new CustomError('credentials does not match', 400)
+            }
 
-        const { password: userPass, ...userData } = user
+            const { password: userPass, ...userData } = user
      
-        const isPasswordMatch = await comparePassword(password, userPass)
+            const isPasswordMatch = await comparePassword(password, userPass)
 
-        if (!isPasswordMatch) {
-            throw new CustomError('credentials does not match',400)
-        }
+            if (!isPasswordMatch) {
+                throw new CustomError('credentials does not match', 400)
+            }
           
-        //!generate token 
+            //!generate token
+    
         
 
-
-
-        res.status(201).json({
-            message: 'Login sucessful', 
-            status: 'success', 
-            success: true, 
-            data: userData, 
+            res.status(201).json({
+                message: "Login sucessful",
+                status: 'success',
+                success: true,
+                data: userData ?? null,
             
-          })
+            });
 
 
-    } catch (error: any) {
-        res.status(500).json({
-            message: error?.message ?? 'Internal Server Error',
-            success: false,
-            status: 'fail',
-            data: null,
-        });
-        
-    }
+        } catch (error: any) {
+            next(error);
 
-}
-
-
+        }
+    });
