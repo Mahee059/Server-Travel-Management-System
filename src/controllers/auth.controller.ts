@@ -12,7 +12,7 @@ export const register = async (req: Request, res: Response) => {
     //cosnole.log(re)
 
     if (!password) {
-      throw new Error("password is required");
+      throw new CustomError("password is required",400);
     }
     const user = new User({
       firstName,

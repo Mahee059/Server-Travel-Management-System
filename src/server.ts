@@ -1,7 +1,9 @@
 import 'dotenv/config'
 import express, { NextFunction, Request, Response } from 'express'
+import cookieParser from 'cookie-parser'
 import { connectDatabase } from './config/database.config'
-import  CustomError , { errorHandler } from './middlewares/error-handler.middleware'
+import CustomError, { errorHandler } from './middlewares/error-handler.middleware'
+
 
 //importing routes
 import authRoutes from './routes/auth.routes'
@@ -19,6 +21,7 @@ const app = express()
 //using middleswares
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json({ limit: '5mb' }))
+app.use (cookieParser())
 //cors
 //headers
 //...

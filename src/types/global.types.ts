@@ -8,3 +8,9 @@ export interface IPayload {
     role:Role, 
 
 }
+
+export interface IJwtpayload extends IPayload { 
+    iat: number; 
+    exp: number; 
+    
+}
