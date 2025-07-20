@@ -1,15 +1,43 @@
-import express from 'express'
-import { create, getAll, getBYId, remove, update} from '../controllers/tour_package.controllers';
-import { authenticate } from '../middlewares/authorization.middleware';
+import express from "express";
+import {
+  create,
+  getAll,
+  getBYId,
+  remove,
+  update,
+} from "../controllers/tour_package.controllers";
+import { authenticate } from "../middlewares/authorization.middleware";
+import { AllAdmins } from "../types/global.types";
+import { upload } from "../middlewares/file-uploader.middleware";
 
-const router = express.Router()
+// multer uploader
+const uploader = upload();
 
-router.post('/', create)
-router.get('/',authenticate(), getAll)
-router.get('/:id',getBYId)
-router.put('/:id',update)
-router.delete('/:id',remove)
+const router = express.Router();
 
+//public routes
+router.get("/", getAll);
+router.get("/:id", getBYId);
 
-export default router; 
+//private routes
+router.post(
+    "/",
+     authenticate(AllAdmins),
+  uploader.fields([
+    {
+      name: "cover_image",
+      maxCount: 1,
+    },
+    {
+      name: "images",
+      maxCount: 5,
+    },
+  ]),
 
+  create
+);
+
+router.put("/:id", authenticate(AllAdmins), update);
+router.delete("/:id", authenticate(AllAdmins), remove);
+
+export default router;

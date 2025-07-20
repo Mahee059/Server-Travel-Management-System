@@ -13,7 +13,7 @@ const packageSchema = new Schema({
         type: String, 
         required:[true,'cover image is requried']
     },
-    iamge: [{
+    images: [{
          type:String,
     },
     ], 

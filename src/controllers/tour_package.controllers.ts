@@ -7,7 +7,7 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
     console.log(req.body)
     
     const {
-        destination,
+        destinations,
         title,
         start_date,
         end_date, seats_available,
@@ -17,16 +17,38 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
     
     } = req.body
 
-    const tour_package = await Tour_Package.create({
-        destination:JSON.parse(destination ?? ""), 
+    const { cover_image, images } = req.files as { 
+        [filename: string]: Express.Multer.File[];
+    }
+ 
+    if (!cover_image) { 
+        throw new CustomError('cover iamge is required', 400); 
+    
+    } 
+    console.log(images)
+
+
+
+    const tour_package = new Tour_Package ({
+        destination: JSON.parse(destinations ?? ""),
         title,
-        start_date:new Date(start_date), 
-        end_date: new Date (end_date),
+        start_date: new Date(start_date),
+        end_date: new Date(end_date),
         seats_available,
         total_charge,
         cost_type,
         description
-    })
+    }); 
+     
+    tour_package.cover_image = cover_image[0].path;
+
+    if (images && images.length > 0) {
+        images.map(image => image.path)
+    
+        const imagePath = images.map(image => image.path)
+        tour_package.images = imagePath
+    }
+    await  tour_package.save()
 
     res.status(201).json({
         data:tour_package
@@ -125,3 +147,5 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
 })
 
     
+
+

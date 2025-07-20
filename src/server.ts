@@ -47,7 +47,7 @@ app.use('/api/tour_package',PackageRoutes)
  
 //fallback route
 app.all('/{*a}', (req: Request, res: Response, next: NextFunction) => {
-    const error: any = new CustomError(`can not ${req.method} on $ {req.originalUrl}` , 404)
+    const error: any = new CustomError(`can not ${req.method} on ${req.originalUrl}` , 404)
     next (error)
     
 })

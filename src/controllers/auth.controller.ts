@@ -55,7 +55,7 @@ export const login = asyncHandler(
       throw new CustomError("password required", 400);
     }
 
-    const user = await User.findOne({ email });
+    const user : any  = await User.findOne({ email });
     if (!user) {
       throw new CustomError("credentials does not match", 400);
     }
@@ -90,7 +90,7 @@ export const login = asyncHandler(
         status: "success",
         success: true,
         data: {
-          data: userData,
+          data: userData._doc,
           access_token: token,
         },
       });
