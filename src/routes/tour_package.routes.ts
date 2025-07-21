@@ -37,7 +37,21 @@ router.post(
   create
 );
 
-router.put("/:id", authenticate(AllAdmins), update);
+
+
+router.put("/:id", authenticate(AllAdmins), uploader.fields([
+  {
+    name: 'cover_image',
+    maxCount: 1
+  }, 
+
+   { 
+     name: 'images',
+     maxCount:5, 
+   }
+]),update
+  
+);
 router.delete("/:id", authenticate(AllAdmins), remove);
 
 export default router;

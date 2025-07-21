@@ -14,7 +14,6 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
         total_charge,
         cost_type,
         description,
-    
     } = req.body
 
     const { cover_image, images } = req.files as { 
@@ -87,7 +86,14 @@ export const getBYId = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const update = asyncHandler(async (req: Request, res: Response) => {
-        const{id} = req.params
+    const { id } = req.params
+    const { cover_image, images } = req.files as {
+        [fieldname: string]: Express.Multer.File[];
+        
+    };
+
+
+
     const {
         destination,
         title,
@@ -96,6 +102,8 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
         total_charge,
         cost_type,
         description,
+        deletedImage,
+
     
     } = req.body
 
@@ -120,6 +128,21 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
         await tour_package.save(); 
 
     } 
+    if (cover_image) { 
+    tour_package.cover_image = cover_image [0].path
+    }
+    
+if(deletedImage && deletedImage.length > 0){
+        tour_package.images = tour_package.images.filter((img) => !deletedImage.includes(img))
+    }
+
+  
+    if (images && images.length > 0) {
+        const imagePath = images.map(image => image.path)
+        tour_package.images = [...tour_package.images,...imagePath]
+    }
+    await tour_package.save()
+    
     res.status(200).json({
         message: 'Tour plan updated',
         success: true,

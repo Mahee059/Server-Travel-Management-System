@@ -25,6 +25,10 @@ app.use (cookieParser())
 //cors
 //headers
 //...
+ 
+
+// serving static. files 
+app.use("/api/uploads", express.static("uploads/"));
 
 //connect database 
 connectDatabase(DB_URI)
