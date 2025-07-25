@@ -25,7 +25,7 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
   };
 
   if (!cover_image) {
-    throw new CustomError("cover iamge is required", 400);
+    throw new CustomError("cover image is required", 400);
   }
   console.log(images);
 

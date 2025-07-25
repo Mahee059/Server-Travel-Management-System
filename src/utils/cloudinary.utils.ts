@@ -3,10 +3,11 @@ import CustomError from "../middlewares/error-handler.middleware";
 import fs  from 'fs'
 
 
-export const uploadFile = async (path: string, folder: string = '/') => {
+export const uploadFile = async (path: string, dir: string = '/') => {
+    console.log(dir)
     try {
         const { public_id, secure_url } = await cloudinary.uploader.upload(path, {
-            floder: 'travel_managent' + folder,
+            folder: 'travel_managent' + dir,
             allowed_formats: ['gif', 'jpg', 'png', 'webp', 'svg'],
             unique_filename: true
         })
