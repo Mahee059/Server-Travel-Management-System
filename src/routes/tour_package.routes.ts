@@ -52,6 +52,8 @@ router.put("/:id", authenticate(AllAdmins), uploader.fields([
 ]),update
   
 );
+
+
 router.delete("/:id", authenticate(AllAdmins), remove);
 
 export default router;

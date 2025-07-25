@@ -10,12 +10,29 @@ const packageSchema = new Schema({
 
 
     cover_image: { 
+        path:{ 
         type: String, 
-        required:[true,'cover image is requried']
+        required:[true,'cover image is requried'],
     },
-    images: [{
-         type:String,
+
+        public_id: {
+            type: String,
+            required: [true, "cover image is required"],
+        }
+     },
+
+
+    images: [
+         { 
+        path:{ 
+        type: String, 
     },
+
+        public_id: {
+            type: String,
+        }
+     }
+        
     ], 
     
     destination:[
