@@ -37,8 +37,19 @@ export const authenticate = (roles:Role[])=>{
             if(Array.isArray(roles) && (!roles?.includes(user.role) || !roles?.includes(decodedData.role))){
                 throw new customError('Forbidden. you cannot access this resource.', 403)
             }
+           
 
-            next()
+             req.user = {
+                    _id:user._id,
+                    email:user.email,
+                    firstName:user.firstName,
+                    lastName:user.lastName,
+                    role:user.role
+            }
+
+
+
+            next();
             
         } catch(error){
             next(error)

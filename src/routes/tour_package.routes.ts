@@ -2,7 +2,7 @@ import express from "express";
 import {
   create,
   getAll,
-  getBYId,
+  getbyId,
   remove,
   update,
 } from "../controllers/tour_package.controllers";
@@ -17,7 +17,7 @@ const router = express.Router();
 
 //public routes
 router.get("/", getAll);
-router.get("/:id", getBYId);
+router.get("/:id", getbyId);
 
 //private routes
 router.post(

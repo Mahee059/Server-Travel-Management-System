@@ -1,19 +1,25 @@
-export enum Gender{ 
+export enum Gender{
     MALE = 'MALE',
     FEMALE = 'FEMALE',
-    OTHERS = 'OTHERS', 
-    NOTPREFER ='NOTPREFER'
+    NOTPREFER = 'NOTPREFER'
 }
 
-export enum Role { 
+export enum Role{
     USER = 'USER',
-    SUPER_ADMIN = 'SUPER ADMIN',
-    ADMIN ='ADMIN',
+    SUPER_ADMIN = 'SUPER_ADMIN',
+    ADMIN = 'ADMIN'
 }
 
 
-export enum Package_Charge { 
+export enum Package_Charge {
     PER_DAY = 'PER_DAY',
-    PER_PERSON = 'PER_PERSON',
+    PER_PERSON = 'PER_PERSON'
+}
 
+
+export enum Booking_Status {
+    PENDING = "PENDING",
+    CONFIRMED= "CONFIRMED",
+    COMPLETED = "COMPLETED",
+    CANCELLED = "CANCELLED"
 }

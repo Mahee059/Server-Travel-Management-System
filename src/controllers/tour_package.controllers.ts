@@ -7,21 +7,19 @@ import { deleteFile, uploadFile } from "../utils/cloudinary.utils";
 const tour_package_folder = "/tour_package";
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
-  console.log(req.body);
-
   const {
     destinations,
     title,
     start_date,
     end_date,
-    seats_available,
+    total_seats,
     total_charge,
     cost_type,
     description,
   } = req.body;
 
   const { cover_image, images } = req.files as {
-    [filename: string]: Express.Multer.File[];
+    [fieldname: string]: Express.Multer.File[];
   };
 
   if (!cover_image) {
@@ -30,15 +28,20 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
   console.log(images);
 
   const tour_package = new Tour_Package({
-    destination: JSON.parse(destinations ?? ""),
+    destinations: destinations ? JSON.parse(destinations ?? "") : null,
     title,
     start_date: new Date(start_date),
     end_date: new Date(end_date),
-    seats_available,
+    seats_available:total_seats,
+    total_seats,
     total_charge,
     cost_type,
     description,
   });
+
+  if (!tour_package) {
+    throw new CustomError("Someting went wrong.Try again later", 500);
+  }
 
   tour_package.cover_image = await uploadFile(
     cover_image[0].path,
@@ -53,6 +56,9 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
   }
 
   res.status(201).json({
+    message: "Package added successfully.",
+    succes: true,
+    status: "success",
     data: tour_package,
   });
 });
@@ -61,24 +67,24 @@ export const getAll = asyncHandler(async (req: Request, res: Response) => {
   const tour_packages = await Tour_Package.find({});
 
   res.status(201).json({
-    messages: "Packages fetched successfully.",
-    success: true,
+    message: "Packages fetched successfully.",
+    succes: true,
     status: "success",
     data: tour_packages,
   });
 });
 
-export const getBYId = asyncHandler(async (req: Request, res: Response) => {
+export const getById = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const tour_package = await Tour_Package.findOne({ _id: id });
 
   if (!tour_package) {
-    throw new CustomError("Tour plan is not found", 401);
+    throw new CustomError("Tour plan is not found", 404);
   }
 
   res.status(201).json({
-    messages: "Packages fetched successfully.",
-    success: true,
+    message: "Package fetched successfully.",
+    succes: true,
     status: "success",
     data: tour_package,
   });
@@ -91,7 +97,7 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
   };
 
   const {
-    destination,
+    destinations,
     title,
     start_date,
     end_date,
@@ -99,7 +105,7 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
     total_charge,
     cost_type,
     description,
-    deletedImage,
+    deletededImage,
   } = req.body;
 
   const tour_package = await Tour_Package.findByIdAndUpdate(
@@ -115,46 +121,50 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
     },
     { new: true, reValidate: true }
   );
+
   if (!tour_package) {
     throw new CustomError("Tour plan is not found", 404);
   }
-  if (destination) {
-    tour_package.destination = JSON.parse(destination);
-    await tour_package.save();
+
+  if (destinations) {
+    tour_package.destinations = JSON.parse(destinations);
+    // await tour_package.save();
   }
+
   if (cover_image) {
+    // !__________
     if (tour_package.cover_image) {
       await deleteFile([tour_package?.cover_image?.public_id]);
     }
+
     tour_package.cover_image = await uploadFile(
       cover_image[0].path,
       tour_package_folder
     );
-    }
-    
+  }
 
   if (
-    deletedImage &&
-    deletedImage.length > 0 &&
+    deletededImage &&
+    deletededImage.length > 0 &&
     tour_package.images.length > 0
   ) {
-  
-      //! delete images from cloudinary
-      await deleteFile(deletedImage);
+    //! delete images form cloudinary
+    await deleteFile(deletededImage);
 
-      const oldImages = tour_package.images.filter(
-        (img) => !deletedImage.includes(img.public_id)
-      );
-      tour_package.set("images", oldImages);
-    
+    const oldImages = tour_package.images.filter(
+      (img) => !deletededImage.includes(img.public_id)
+    );
+
+    tour_package.set("images", oldImages);
   }
 
   if (images && images.length > 0) {
-    const imagePath = await images.map(
-      async (img) => await uploadFile(img.path, tour_package_folder)
+    const imagePath = await Promise.all(
+      images.map(async (img) => await uploadFile(img.path, tour_package_folder))
     );
     tour_package.set("images", [...tour_package.images, ...imagePath]);
   }
+
   await tour_package.save();
 
   res.status(200).json({
@@ -165,28 +175,27 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
-//! delete tour package
-
+// ! delete tour package
 export const remove = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-    const tour_package = await Tour_Package.findById(id);
-   
+
+  const tour_package = await Tour_Package.findById(id);
+
   if (!tour_package) {
-    throw new CustomError("package not found", 404);
-    }
-    
+    throw new CustomError("Package not found", 404);
+  }
 
-    if (tour_package.cover_image) {
-        
-        await deleteFile([tour_package.cover_image?.public_id]);
-    } 
+  if (tour_package.cover_image) {
+    await deleteFile([tour_package.cover_image?.public_id]);
+  }
 
-    if (tour_package.images.length > 0) { 
-        await deleteFile(tour_package.images.map((image) => image?.public_id as string)
-        );
-    }
-    await tour_package.deleteOne();
+  if (tour_package.images.length > 0) {
+    await deleteFile(
+      tour_package.images.map((image) => image?.public_id as string)
+    );
+  }
 
+  await tour_package.deleteOne();
 
   res.status(200).json({
     message: "Package deleted",
@@ -195,7 +204,3 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
     status: "success",
   });
 });
-
-
-//booking controler
-//user profile image 
