@@ -5,15 +5,16 @@ import CustomError from "../middlewares/error-handler.middleware";
 import { asyncHandler } from "../utils/async-handler.utils";
 import { generateToken } from "../utils/jwt.utils";
 import { IPayload } from "../types/global.types";
+import { sendMail } from "../utils/nodemailer.utils";
 
-export const register = async (req: Request, res: Response) => {
-  try {
+export const register = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
     const { firstName, lastName, email, password, phone, gender } = req.body;
-    //cosnole.log(re)
 
     if (!password) {
-      throw new CustomError("password is required",400);
+      throw new CustomError("password is required", 400);
     }
+
     const user = new User({
       firstName,
       lastName,
@@ -29,44 +30,40 @@ export const register = async (req: Request, res: Response) => {
     await user.save();
 
     res.status(201).json({
-      message: "user registered sucessfully",
-      sucess: true,
+      message: "user registered successfully!",
+      success: true,
       status: "success",
       data: user,
     });
-  } catch (error: any) {
-    res.status(500).json({
-      message: error?.message ?? "Internal Server Error",
-      success: false,
-      status: "fail",
-      data: null,
-    });
   }
-};
+);
 
 export const login = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      throw new CustomError("email required", 400);
+    if (!email) {
+      throw new CustomError("email required", 400); //400
     }
+
     if (!password) {
-      throw new CustomError("password required", 400);
+      throw new CustomError("password required", 400); //400
     }
 
-    const user : any  = await User.findOne({ email });
+    const user: any = await User.findOne({ email });
+
     if (!user) {
-      throw new CustomError("credentials does not match", 400);
+      throw new CustomError("credentials does not match", 400); //400
     }
 
-    const { password: userPass, ...userData } = user;
+    const { password: userPass, ...userData } = user?._doc;
 
     const isPasswordMatch = await comparePassword(password, userPass);
 
     if (!isPasswordMatch) {
-      throw new CustomError("credentials does not match", 400);
+      throw new CustomError("credentials does not match", 400); //400
     }
+
     const payload: IPayload = {
       _id: user._id,
       email: user.email,
@@ -74,25 +71,33 @@ export const login = asyncHandler(
       lastname: user.lastName,
       role: user.role,
     };
-    //!generate token
 
+    //! generate token
     const token = generateToken(payload);
+    await sendMail({
+      html: "<h1>Login success</h1>",
+      to: user.email,
+      subject: "Login Success",
+    });
     console.log(token);
     res
       .cookie("access_token", token, {
         secure: process.env.NODE_ENV === "development" ? false : true,
         httpOnly: true,
         maxAge:
-          Number(process.env.COOKIE_EXPRESS_in ?? "7") * 24 * 60 * 60 * 1000,
+          Number(process.env.COOKIE_EXPIRES_IN ?? "7") * 24 * 60 * 60 * 1000,
       })
-      .status(201).json({
-        message: "Login sucessful",
+      .status(201)
+      .json({
+        message: "Login successful",
         status: "success",
         success: true,
         data: {
-          data: userData._doc,
+          data: userData,
           access_token: token,
         },
       });
   }
 );
+
+// !update user

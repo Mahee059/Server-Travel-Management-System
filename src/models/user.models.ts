@@ -25,7 +25,18 @@ const userSchema = new Schema({
         required: [true, 'password is required'], 
         min:6
     }, 
+     
 
+    profile_image: {
+        path: {
+            type: String,
+            
+        },
+        public_id: {
+            type: String,
+            
+        },
+    },
     role: {
         type: String, 
         enum: Object.values(Role),

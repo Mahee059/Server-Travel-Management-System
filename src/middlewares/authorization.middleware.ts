@@ -48,7 +48,6 @@ export const authenticate = (roles:Role[])=>{
             }
 
 
-
             next();
             
         } catch(error){

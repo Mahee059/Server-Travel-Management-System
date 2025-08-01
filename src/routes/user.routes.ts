@@ -1,20 +1,16 @@
-import express from 'express';
-import { getallUser, getBYId, deleteUser, updateProfile } from '../controllers/user.controllers';
-import { authenticate } from '../middlewares/authorization.middleware';
-import { AllAdmins, ALLUserAndAdmins } from '../types/global.types';
+import express from 'express'
+import { deleteUser, getAllUser, getById, updateProfile} from '../controllers/user.controllers'
+import { authenticate } from '../middlewares/authorization.middleware'
+import { AllAdmins, ALLUserAndAdmins, OnlyUser } from '../types/global.types'
+import { upload } from '../middlewares/file-uploader.middleware'
 
+const uploader = upload()
+const router = express.Router()
 
-const router = express.Router();
-
-router.get('/',authenticate(AllAdmins),getallUser)
-router.get('/:userId',authenticate(ALLUserAndAdmins),getBYId)
-router.put('/:userId',authenticate(ALLUserAndAdmins),updateProfile)
-
-
-router.delete('/:userId', deleteUser);
- 
-
-
+router.get('/',authenticate(AllAdmins),getAllUser)
+router.get('/:userId',authenticate(ALLUserAndAdmins),getById)
+router.put('/:userId',authenticate(ALLUserAndAdmins),uploader.single('profile_image'), updateProfile)
+router.delete('/:userId', authenticate(ALLUserAndAdmins), deleteUser)
 
 
 

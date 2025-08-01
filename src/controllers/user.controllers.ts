@@ -2,81 +2,105 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import User from "../models/user.models";
 import CustomError from "../middlewares/error-handler.middleware";
 import { asyncHandler } from "../utils/async-handler.utils";
+import {deleteFile, uploadFile} from "../utils/cloudinary.utils"
 
-export const getallUser = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const users = await User.find({});
-    res.status(200).json({
-      messsage: "All user fetched",
-      status: "success",
-      success: "true",
-      data: users,
-    });
-  }
-);
+const user_folder = '/user'
 
-//get user by id
-export const getBYId = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    //1. get user id <-from client
+//get all user
 
-    const { id } = req.params;
-    //2. query db <-findBYid()
+export const getAllUser = asyncHandler(
+    async(req:Request, res: Response, next:NextFunction)=> {
+   
+        const users:any = await User.find().select("-password")
 
-    const user = await User.findOne({ _id: id });
-    //const user = User.findById(id)
+        res.status(200).json({
+            message:'All users fetched',
+            status:'success',
+            success:true,
+            data:users
+        })
 
-    if (!user) {
-      throw new CustomError("user not found", 404);
+})
+
+
+//get by id
+
+export const getById = asyncHandler(async(req:Request, res:Response, next:NextFunction) =>{
+const {userId} = req.params
+        
+        const user:any = await User.findById(userId).select("-password")
+        if(!user){
+            throw new CustomError("user not found",404)
+        }
+        res.status(200).json({
+            message:`user fetched`,
+            status:"success",
+            success:true,
+            data:user
+        })
+
+})
+
+
+//update profile
+export const updateProfile =asyncHandler(  async(req:Request, res:Response, next:NextFunction) =>{
+      const {firstName,lastName,phone,gender} = req.body
+      const {userId} = req.params
+      const profile_image = req.file as Express.Multer.File;
+
+      const user = await User.findById(userId)
+      
+      if(!user){
+            throw new CustomError("user not found",404);
+        }
+    
+    if(firstName) user.firstName = firstName
+    if(lastName) user.lastName = lastName
+    if(phone) user.phone = phone
+    if(gender) user.gender = gender
+    
+    if(profile_image){
+        if(user.profile_image?.public_id){
+            await deleteFile([user?.profile_image?.public_id])
+        }
+        user.profile_image = await uploadFile(profile_image.path,user_folder)
     }
+    await user.save()
+
+    // OR findByIdAndUpdate ({id},{firstName,lastName,phone,gender},{new:true})
 
     res.status(200).json({
-      message: "All user fetched",
-      status: "success",
-      data: user,
-    });
-  }
-);
-export const deleteUser = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { userId } = req.params;
+        message:`profile updated successully`,
+        success: true,
+        status:'success',
+        data:user
+    })
+  
+})
 
-      const deletedUser = await User.findByIdAndDelete(userId);
 
-      if (!deletedUser) {
-        throw new CustomError("user not found", 404);
-      }
+//delete user
 
-      res.status(200).json({
-        message: `user deleted`,
-        data: deletedUser,
-      });
-    } catch (error: any) {
-      next(error);
-    }
-  }
-);
+export const deleteUser = asyncHandler(async(req:Request,res:Response,next:NextFunction) => {
+        const {userId} = req.params
+         const user = await User.findById(userId)
 
-export const updateProfile = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { firstName, lastName, phone, gender } = req.body;
-    const { id } = req.params;
-    const user = await User.findById(id);
-    if (!user) {
-      throw new CustomError("User not found", 404);
-    }
-    if (firstName) user.firstName = firstName;
-    if (lastName) user.lastName = lastName;
-    if (phone) user.phone = phone;
-    if (gender) user.gender = gender;
 
-    await user.save();
+         if(!user){
+            throw new CustomError("user not found",404);
+        }
+
+        if(user.profile_image?.public_id){
+          await deleteFile([user.profile_image?.public_id])
+        }
+    
+        await user.deleteOne()
+        
     res.status(200).json({
-      message: `profile updated succesfully`,
-      success: true,
-      status: "success",
-      data: user,
-    });
-  }
-);
+        message:`user deleted sucessfully`,
+        success:true,
+        status:'success',
+        data:null
+    })
+
+})
