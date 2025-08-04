@@ -14,7 +14,7 @@ export const register = asyncHandler(
     if (!password) {
       throw new CustomError("password is required", 400);
     }
-
+    console.log(email)
     const user = new User({
       firstName,
       lastName,
@@ -26,7 +26,7 @@ export const register = asyncHandler(
     const hashedPassword = await hashPoassword(password);
 
     user.password = hashedPassword;
-
+     console.log(user)
     await user.save();
 
     res.status(201).json({
@@ -74,11 +74,11 @@ export const login = asyncHandler(
 
     //! generate token
     const token = generateToken(payload);
-    await sendMail({
-      html: "<h1>Login success</h1>",
-      to: user.email,
-      subject: "Login Success",
-    });
+    // await sendMail({
+    //   html: "<h1>Login success</h1>",
+    //   to: "aerapoudel@gmail.com",
+    //   subject: "Login Success",
+    // });
     console.log(token);
     res
       .cookie("access_token", token, {

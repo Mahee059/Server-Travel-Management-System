@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/async-handler.utils";
 import Tour_Package from "../models/tour_packages.models";
 import CustomError from "../middlewares/error-handler.middleware";
 import { deleteFile, uploadFile } from "../utils/cloudinary.utils";
+import { start } from "repl";
 
 const tour_package_folder = "/tour_package";
 
@@ -21,6 +22,8 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
   const { cover_image, images } = req.files as {
     [fieldname: string]: Express.Multer.File[];
   };
+
+  console.log(req.files)
 
   if (!cover_image) {
     throw new CustomError("cover image is required", 400);
@@ -54,7 +57,7 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
     );
     tour_package.set("images", imagePath);
   }
-
+await tour_package.save()
   res.status(201).json({
     message: "Package added successfully.",
     succes: true,
@@ -63,8 +66,16 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+
 export const getAll = asyncHandler(async (req: Request, res: Response) => {
-  const tour_packages = await Tour_Package.find({});
+
+  const { query } = req.query
+  let filter :Record<string,any>={}
+  
+ 
+  
+      
+  const tour_packages = await Tour_Package.find(filter).sort({createdAt:-1});
 
   res.status(201).json({
     message: "Packages fetched successfully.",

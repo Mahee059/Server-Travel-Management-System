@@ -30,6 +30,7 @@ class CustomError extends Error  {
 
     export const errorHandler = (error:any, req:Request, res:Response, next:NextFunction)=> {
       const statusCode = error?.statusCode || 500;
+      console.log(error)
       
       const message = error?.message || 'Internal sever error'
       const success = error?.status || false 

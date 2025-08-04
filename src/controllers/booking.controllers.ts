@@ -9,7 +9,11 @@ import { sendMail } from "../utils/nodemailer.utils";
 
 export const book = asyncHandler(async (req: Request, res: Response) => {
   const { tour_package, total_person } = req.body;
+    
+  console.log('Called')
+
   const user = req.user._id;
+  console.log('user')
   let total_cost: number;
 
   if (!tour_package) {
@@ -17,6 +21,7 @@ export const book = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const tourPackage = await Tour_Package.findById(tour_package);
+  console.log(tour_package)
 
   if (!tourPackage) {
     throw new CustomError("package not found", 400);
@@ -265,3 +270,7 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
     success: true,
   });
 });
+
+
+//get bookings by user 
+//-> filter 
