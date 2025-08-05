@@ -6,22 +6,21 @@ import Tour_Package from "../models/tour_packages.models";
 import { Booking_Status, Package_Charge } from "../types/enum.types";
 import { sendMail } from "../utils/nodemailer.utils";
 
-
 export const book = asyncHandler(async (req: Request, res: Response) => {
+  console.log('called')
   const { tour_package, total_person } = req.body;
-    
-  console.log('Called')
 
   const user = req.user._id;
   console.log('user')
   let total_cost: number;
 
+  console.log(tour_package)
   if (!tour_package) {
     throw new CustomError("tour package is required", 400);
   }
 
   const tourPackage = await Tour_Package.findById(tour_package);
-  console.log(tour_package)
+  console.log(tourPackage)
 
   if (!tourPackage) {
     throw new CustomError("package not found", 400);
@@ -54,9 +53,42 @@ export const book = asyncHandler(async (req: Request, res: Response) => {
 
   tourPackage.seats_available -= Number(total_person);
 
+const html = `
+  <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      
+      <div style="background-color: #4CAF50; color: #ffffff; padding: 20px; text-align: center;">
+        <h2>🎉 Booking Confirmed!</h2>
+        <p>Thank you for choosing our tour service.</p>
+      </div>
+
+      <div style="padding: 30px;">
+        <h3 style="margin-top: 0;">Booking Details</h3>
+        <p><strong>Package Name:</strong> ${tourPackage.title}</p>
+        <p><strong>Total Persons:</strong> ${booking.total_person}</p>
+        <p><strong>Booking Date:</strong> ${new Date(booking.createdAt)}</p>
+        <p><strong>Start Date:</strong> ${tourPackage.start_date}</p>
+        <p><strong>End Date:</strong> ${tourPackage.end_date}</p>
+        <p><strong>Total Amount:</strong> ₹${booking.total_amount}</p>
+
+        <hr style="margin: 20px 0;">
+
+        <p>If you have any questions, feel free to reply to this email.</p>
+        <p>We look forward to giving you an unforgettable experience!</p>
+      </div>
+
+      <div style="background-color: #f1f1f1; text-align: center; padding: 15px;">
+        <p style="margin: 0;">&copy; ${new Date().getFullYear()} Your Travel Company. All rights reserved.</p>
+      </div>
+
+    </div>
+  </div>
+`;
+
+
   //! send mail
   await sendMail({
-      html: "<h1>Package booked</h1>",
+      html,
       // package name , total person , booking time , total amount
       to: req.user.email,
       subject: "Booking success",
@@ -141,9 +173,37 @@ export const getUsersBooking = asyncHandler(
 // ! get all bookings for admin
 export const getAllBookings = asyncHandler(
   async (req: Request, res: Response) => {
+    const {query} = req.query
     const bookings = await Booking.find({})
       .populate("tour_package")
       .populate("user");
+
+    // const aggregate = [
+    //   {
+    //     $lookup:{
+    //       from:'users',
+    //       localField:'user',
+    //       foreignField:'_id',
+    //       as:'user'
+    //     }
+    //   },
+    //   {
+    //     $unwind:'$user'
+    //   },
+    //   {
+    //     $match:{
+    //    'user.firstName': {
+    //         $options:'i',
+    //         $regex:query
+    //       }
+
+    //     }
+    //   }
+    // ]
+
+
+    // const bookings =await  Booking.aggregate(aggregate)
+
 
     res.status(200).json({
       message: "Bookings fetched",
@@ -258,8 +318,6 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
   }
 
   //! send mail
-
-
   await booking.save();
   await tour_package.save();
 
@@ -272,5 +330,5 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
 });
 
 
-//get bookings by user 
-//-> filter 
+// get bookings by user 
+// -> filter

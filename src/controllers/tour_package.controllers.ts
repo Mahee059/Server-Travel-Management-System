@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/async-handler.utils";
 import Tour_Package from "../models/tour_packages.models";
 import CustomError from "../middlewares/error-handler.middleware";
 import { deleteFile, uploadFile } from "../utils/cloudinary.utils";
-import { start } from "repl";
+import { getPagination } from "../utils/pagination.utils";
 
 const tour_package_folder = "/tour_package";
 
@@ -23,8 +23,6 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
     [fieldname: string]: Express.Multer.File[];
   };
 
-  console.log(req.files)
-
   if (!cover_image) {
     throw new CustomError("cover image is required", 400);
   }
@@ -35,7 +33,7 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
     title,
     start_date: new Date(start_date),
     end_date: new Date(end_date),
-    seats_available:total_seats,
+    seats_available: total_seats,
     total_seats,
     total_charge,
     cost_type,
@@ -57,7 +55,8 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
     );
     tour_package.set("images", imagePath);
   }
-await tour_package.save()
+
+  await tour_package.save();
   res.status(201).json({
     message: "Package added successfully.",
     succes: true,
@@ -66,22 +65,89 @@ await tour_package.save()
   });
 });
 
-
 export const getAll = asyncHandler(async (req: Request, res: Response) => {
+  const {
+    query,
+    start_date,
+    end_date,
+    min_price,
+    max_price,
+    seats_available,
+    limit,
+    page,
+  } = req.query;
+  const page_limit = Number(limit) || 15;
+  const current_page = Number(page) || 1;
 
-  const { query } = req.query
-  let filter :Record<string,any>={}
-  
- 
-  
-      
-  const tour_packages = await Tour_Package.find(filter).sort({createdAt:-1});
+  const skip = (current_page - 1) * page_limit;
+
+  let filter: Record<string, any> = {};
+
+  if (query) {
+    filter.$or = [
+      {
+        title: {
+          $regex: query,
+          $options: "i",
+        },
+      },
+      {
+        description: {
+          $regex: query,
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  if (start_date || end_date) {
+    if (start_date) {
+      filter.start_date = {
+        $gte: start_date,
+      };
+    }
+
+    if (end_date) {
+      filter.end_date = {
+        $lte: end_date,
+      };
+    }
+  }
+
+  if (min_price || max_price) {
+    if (min_price) {
+      filter.total_charge = {
+        $gte: min_price,
+      };
+    }
+
+    if (max_price) {
+      filter.total_charge = {
+        $lte: max_price,
+      };
+    }
+  }
+
+  if (seats_available) {
+    filter.seats_available = {
+      $gte: seats_available,
+    };
+  }
+
+  const tour_packages = await Tour_Package.find(filter)
+    .limit(page_limit)
+    .skip(skip);
+
+  const total = await Tour_Package.countDocuments(filter);
 
   res.status(201).json({
     message: "Packages fetched successfully.",
     succes: true,
     status: "success",
-    data: tour_packages,
+    data: {
+      data: tour_packages,
+      pagination: getPagination(total, page_limit, current_page),
+    },
   });
 });
 
