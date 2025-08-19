@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.register = void 0;
+exports.profile = exports.Logout = exports.logout = exports.login = exports.register = void 0;
 const user_models_1 = __importDefault(require("../models/user.models"));
 const bcrypt_utils_1 = require("../utils/bcrypt.utils");
 const error_handler_middleware_1 = __importDefault(require("../middlewares/error-handler.middleware"));
@@ -103,4 +103,42 @@ exports.login = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __aw
         },
     });
 }));
-// !update user
+exports.logout = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+    });
+    res.status(200).json({
+        success: true,
+        message: "Logout successful",
+    });
+}));
+//!Logout
+exports.Logout = (0, async_handler_utils_1.asyncHandler)((req, res) => {
+    res.clearCookie('access_token', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: process.env.NODE_ENV === 'development' ? false : true,
+    })
+        .status(200).json({
+        message: 'Logged out successfully',
+        success: true,
+        status: 'success',
+        data: null
+    });
+});
+//! get profile 
+exports.profile = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user_id = req.user._id;
+    const user = yield user_models_1.default.findById(user_id);
+    if (!user) {
+        throw new error_handler_middleware_1.default('profile not found', 404);
+    }
+    res.status(200).json({
+        message: 'profile fetched',
+        data: user,
+        success: true,
+        status: 'success'
+    });
+}));

@@ -35,7 +35,10 @@ const authenticate = (roles) => {
             // token expiry
             if (Date.now() > (decodedData === null || decodedData === void 0 ? void 0 : decodedData.exp) * 1000) {
                 res.clearCookie('access_token', {
-                    maxAge: Date.now()
+                    httpOnly: true,
+                    maxAge: Date.now(),
+                    sameSite: 'none',
+                    secure: process.env.NODE_ENV === 'development' ? false : true,
                 });
                 throw new error_handler_middleware_1.default('Unathorized. Access Denied', 401);
             }

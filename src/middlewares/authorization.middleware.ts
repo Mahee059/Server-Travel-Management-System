@@ -26,11 +26,16 @@ export const authenticate = (roles:Role[])=>{
             }
 
             // token expiry
-            if(Date.now()> decodedData?.exp*1000){
-                res.clearCookie('access_token',{
-                    maxAge:Date.now()
+            if (Date.now() > decodedData?.exp * 1000) {
+            
+                res.clearCookie('access_token', {
+                    httpOnly: true, 
+                    maxAge: Date.now(), 
+                    sameSite: 'none', 
+                    secure: process.env.NODE_ENV  === 'development'? false: true, 
                 })
-                throw new customError('Unathorized. Access Denied',401)
+                throw new customError('Unathorized. Access Denied', 401)
+                
             }
 
             //role based

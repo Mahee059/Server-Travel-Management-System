@@ -38,6 +38,8 @@ export const register = asyncHandler(
   }
 );
 
+
+
 export const login = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
@@ -72,6 +74,13 @@ export const login = asyncHandler(
       role: user.role,
     };
 
+
+
+  
+
+
+
+
     //! generate token
     const token = generateToken(payload);
     // await sendMail({
@@ -100,4 +109,56 @@ export const login = asyncHandler(
   }
 );
 
-// !update user
+
+export const logout = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Logout successful",
+    });
+  }
+);
+
+
+//!Logout
+
+export const Logout = asyncHandler((req: Request, res: Response) => { 
+  res.clearCookie('access_token', { 
+    httpOnly: true, 
+    sameSite: 'none', 
+    secure: process.env.NODE_ENV === 'development' ? false : true, 
+    
+  })
+  .status(200).json({ 
+
+      message: 'Logged out successfully', 
+      success: true, 
+    status: 'success', 
+    data:null
+      
+  })
+  
+})
+
+//! get profile 
+export const profile = asyncHandler(async (req: Request, res: Response) => { 
+  const user_id = req.user._id; 
+  const user = await User.findById(user_id); 
+  if (!user) { 
+    throw new CustomError('profile not found', 404)
+  } 
+
+  res.status(200).json({ 
+    message: 'profile fetched', 
+    data: user, 
+    success: true, 
+    status:'success'
+  })
+
+})
