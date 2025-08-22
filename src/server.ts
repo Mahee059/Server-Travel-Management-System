@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import express, { NextFunction, Request, Response } from 'express'
+import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { connectDatabase } from './config/database.config'
 import CustomError, { errorHandler } from './middlewares/error-handler.middleware'
@@ -10,6 +11,7 @@ import authRoutes from './routes/auth.routes'
 import userRoutes from './routes/user.routes'
 import PackageRoutes from './routes/tour_package.routes'
 import bookingRoutes from'./routes/booking.routes'
+import helmet from 'helmet'
 
 const PORT = process.env.PORT || 8080
 
@@ -22,7 +24,8 @@ const app = express()
 //using middleswares
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json({ limit: '5mb' }))
-app.use (cookieParser())
+app.use(cookieParser())
+app.use(helmet())
 //cors
 //headers
 //...
@@ -49,7 +52,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/booking', bookingRoutes);
 app.use('/api/tour_package', PackageRoutes);
-
 
  
 //fallback route

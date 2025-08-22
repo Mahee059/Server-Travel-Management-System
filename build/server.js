@@ -47,6 +47,7 @@ const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const tour_package_routes_1 = __importDefault(require("./routes/tour_package.routes"));
 const booking_routes_1 = __importDefault(require("./routes/booking.routes"));
+const helmet_1 = __importDefault(require("helmet"));
 const PORT = process.env.PORT || 8080;
 const DB_URI = (_a = process.env.DB_URI) !== null && _a !== void 0 ? _a : '';
 const app = (0, express_1.default)();
@@ -54,6 +55,7 @@ const app = (0, express_1.default)();
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.json({ limit: '5mb' }));
 app.use((0, cookie_parser_1.default)());
+app.use((0, helmet_1.default)());
 //cors
 //headers
 //...
