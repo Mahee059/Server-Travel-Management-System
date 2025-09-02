@@ -146,6 +146,7 @@ export const Logout = asyncHandler((req: Request, res: Response) => {
   
 })
 
+
 //! get profile 
 export const profile = asyncHandler(async (req: Request, res: Response) => { 
   const user_id = req.user._id; 
