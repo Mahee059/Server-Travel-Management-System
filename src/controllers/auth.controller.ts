@@ -111,25 +111,11 @@ export const login = asyncHandler(
 );
 
 
-export const logout = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    res.clearCookie("accessToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Logout successful",
-    });
-  }
-);
 
 
 //!Logout
 
-export const Logout = asyncHandler((req: Request, res: Response) => { 
+export const logout = asyncHandler((req: Request, res: Response) => { 
   res.clearCookie('access_token', { 
     httpOnly: true, 
     sameSite: 'none', 

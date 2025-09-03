@@ -140,7 +140,7 @@ export const getAll = asyncHandler(async (req: Request, res: Response) => {
 
   const total = await Tour_Package.countDocuments(filter);
 
-  res.status(201).json({
+  res.status(200).json({
     message: "Packages fetched successfully.",
     succes: true,
     status: "success",
@@ -159,7 +159,7 @@ export const getById = asyncHandler(async (req: Request, res: Response) => {
     throw new CustomError("Tour plan is not found", 404);
   }
 
-  res.status(201).json({
+  res.status(200).json({
     message: "Package fetched successfully.",
     succes: true,
     status: "success",
