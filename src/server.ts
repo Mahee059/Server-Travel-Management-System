@@ -23,7 +23,8 @@ const app = express()
 
 //using middleswares
 app.use(cors({
-    origin:'*'
+    origin: process.env.FRONT_END_URL ?? 'http://localhost:3000',
+    credentials:true
 }))
 app.use(helmet())
 app.use(cookieParser())
