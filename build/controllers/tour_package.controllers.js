@@ -55,7 +55,7 @@ exports.create = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter
 }));
 exports.getAll = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query, start_date, end_date, min_price, max_price, seats_available, limit, page, } = req.query;
-    const page_limit = Number(limit) || 15;
+    const page_limit = Number(limit) || 8;
     const current_page = Number(page) || 1;
     const skip = (current_page - 1) * page_limit;
     let filter = {};
