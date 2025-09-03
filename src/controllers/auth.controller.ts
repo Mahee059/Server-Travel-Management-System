@@ -95,6 +95,7 @@ export const login = asyncHandler(
         httpOnly: true,
         maxAge:
           Number(process.env.COOKIE_EXPIRES_IN ?? "7") * 24 * 60 * 60 * 1000,
+        sameSite:'none'
       })
       .status(201)
       .json({
@@ -132,7 +133,7 @@ export const Logout = asyncHandler((req: Request, res: Response) => {
   res.clearCookie('access_token', { 
     httpOnly: true, 
     sameSite: 'none', 
-    secure: process.env.NODE_ENV === 'development' ? false : true, 
+    secure: process.env.NODE_ENV === 'development' ? false : true,
     
   })
   .status(200).json({ 
