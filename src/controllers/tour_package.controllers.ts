@@ -76,7 +76,7 @@ export const getAll = asyncHandler(async (req: Request, res: Response) => {
     limit,
     page,
   } = req.query;
-  const page_limit = Number(limit) || 15;
+  const page_limit = Number(limit) || 8;
   const current_page = Number(page) || 1;
 
   const skip = (current_page - 1) * page_limit;
