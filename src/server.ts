@@ -22,7 +22,9 @@ const app = express()
 
 
 //using middleswares
-app.use(cors())
+app.use(cors({
+    origin:'*'
+}))
 app.use(helmet())
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
