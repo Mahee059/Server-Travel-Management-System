@@ -22,10 +22,11 @@ const app = express()
 
 
 //using middleswares
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json({ limit: '5mb' }))
+app.use(cors())
 app.use(cookieParser())
 app.use(helmet())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json({ limit: '5mb' }))
 //cors
 //headers
 //...
