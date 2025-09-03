@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.profile = exports.Logout = exports.logout = exports.login = exports.register = void 0;
+exports.profile = exports.logout = exports.login = exports.register = void 0;
 const user_models_1 = __importDefault(require("../models/user.models"));
 const bcrypt_utils_1 = require("../utils/bcrypt.utils");
 const error_handler_middleware_1 = __importDefault(require("../middlewares/error-handler.middleware"));
@@ -91,6 +91,7 @@ exports.login = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __aw
         secure: process.env.NODE_ENV === "development" ? false : true,
         httpOnly: true,
         maxAge: Number((_a = process.env.COOKIE_EXPIRES_IN) !== null && _a !== void 0 ? _a : "7") * 24 * 60 * 60 * 1000,
+        sameSite: 'none'
     })
         .status(201)
         .json({
@@ -103,19 +104,8 @@ exports.login = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __aw
         },
     });
 }));
-exports.logout = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    res.clearCookie("accessToken", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-    });
-    res.status(200).json({
-        success: true,
-        message: "Logout successful",
-    });
-}));
 //!Logout
-exports.Logout = (0, async_handler_utils_1.asyncHandler)((req, res) => {
+exports.logout = (0, async_handler_utils_1.asyncHandler)((req, res) => {
     res.clearCookie('access_token', {
         httpOnly: true,
         sameSite: 'none',

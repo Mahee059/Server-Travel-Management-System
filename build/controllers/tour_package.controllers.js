@@ -108,7 +108,7 @@ exports.getAll = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter
         .limit(page_limit)
         .skip(skip);
     const total = yield tour_packages_models_1.default.countDocuments(filter);
-    res.status(201).json({
+    res.status(200).json({
         message: "Packages fetched successfully.",
         succes: true,
         status: "success",
@@ -124,7 +124,7 @@ exports.getById = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaite
     if (!tour_package) {
         throw new error_handler_middleware_1.default("Tour plan is not found", 404);
     }
-    res.status(201).json({
+    res.status(200).json({
         message: "Package fetched successfully.",
         succes: true,
         status: "success",

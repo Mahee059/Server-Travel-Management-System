@@ -35,10 +35,11 @@ var __importStar = (this && this.__importStar) || (function () {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _a;
+var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const database_config_1 = require("./config/database.config");
 const error_handler_middleware_1 = __importStar(require("./middlewares/error-handler.middleware"));
@@ -52,10 +53,14 @@ const PORT = process.env.PORT || 8080;
 const DB_URI = (_a = process.env.DB_URI) !== null && _a !== void 0 ? _a : '';
 const app = (0, express_1.default)();
 //using middleswares
+app.use((0, cors_1.default)({
+    origin: (_b = process.env.FRONT_END_URL) !== null && _b !== void 0 ? _b : 'http://localhost:3000',
+    credentials: true
+}));
+app.use((0, helmet_1.default)());
+app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.json({ limit: '5mb' }));
-app.use((0, cookie_parser_1.default)());
-app.use((0, helmet_1.default)());
 //cors
 //headers
 //...
