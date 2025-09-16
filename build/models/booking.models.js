@@ -8,28 +8,32 @@ const enum_types_1 = require("../types/enum.types");
 const bookingSchema = new mongoose_1.default.Schema({
     user: {
         type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: 'user',
-        required: [true, 'user is required']
+        ref: "user",
+        required: [true, "user is required"],
     },
     tour_package: {
         type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: 'tour_package',
-        required: [true, 'tour_package is required']
+        ref: "tour_package",
+        required: [true, "tour_package is required"],
     },
     total_person: {
         type: Number,
-        min: [1, 'minimum 1person is required'],
-        required: [true, 'total persons is required'],
+        min: [1, "minimum 1person is required"],
+        required: [true, "total persons is required"],
     },
     total_amount: {
         type: Number,
-        required: [true, 'total amount is required']
+        required: [true, "total amount is required"],
     },
     status: {
         type: String,
         default: enum_types_1.Booking_Status.PENDING,
-        enum: Object.values(enum_types_1.Booking_Status)
-    }
+        enum: Object.values(enum_types_1.Booking_Status),
+    },
+    phone: {
+        type: String,
+        required: [true, "Phone numder is required"],
+    },
 }, { timestamps: true });
 const Booking = mongoose_1.default.model('booking', bookingSchema);
 exports.default = Booking;

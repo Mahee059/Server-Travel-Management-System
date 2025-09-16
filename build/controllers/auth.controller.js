@@ -34,7 +34,6 @@ exports.register = (0, async_handler_utils_1.asyncHandler)((req, res, next) => _
     if (!password) {
         throw new error_handler_middleware_1.default("password is required", 400);
     }
-    console.log(email);
     const user = new user_models_1.default({
         firstName,
         lastName,
@@ -44,7 +43,6 @@ exports.register = (0, async_handler_utils_1.asyncHandler)((req, res, next) => _
     });
     const hashedPassword = yield (0, bcrypt_utils_1.hashPoassword)(password);
     user.password = hashedPassword;
-    console.log(user);
     yield user.save();
     res.status(201).json({
         message: "user registered successfully!",
@@ -80,18 +78,13 @@ exports.login = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __aw
     };
     //! generate token
     const token = (0, jwt_utils_1.generateToken)(payload);
-    // await sendMail({
-    //   html: "<h1>Login success</h1>",
-    //   to: "aerapoudel@gmail.com",
-    //   subject: "Login Success",
-    // });
     console.log(token);
     res
         .cookie("access_token", token, {
         secure: process.env.NODE_ENV === "development" ? false : true,
         httpOnly: true,
         maxAge: Number((_a = process.env.COOKIE_EXPIRES_IN) !== null && _a !== void 0 ? _a : "7") * 24 * 60 * 60 * 1000,
-        sameSite: 'none'
+        sameSite: "none",
     })
         .status(201)
         .json({
@@ -104,21 +97,23 @@ exports.login = (0, async_handler_utils_1.asyncHandler)((req, res, next) => __aw
         },
     });
 }));
-//!Logout
+// !logout
 exports.logout = (0, async_handler_utils_1.asyncHandler)((req, res) => {
-    res.clearCookie('access_token', {
+    res
+        .clearCookie("access_token", {
         httpOnly: true,
-        sameSite: 'none',
-        secure: process.env.NODE_ENV === 'development' ? false : true,
+        sameSite: "none",
+        secure: process.env.NODE_ENV === "development" ? false : true,
     })
-        .status(200).json({
-        message: 'Logged out successfully',
+        .status(200)
+        .json({
+        message: "Logged out successfully",
         success: true,
-        status: 'success',
-        data: null
+        status: "success",
+        data: null,
     });
 });
-//! get profile 
+//! get profile
 exports.profile = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user_id = req.user._id;
     const user = yield user_models_1.default.findById(user_id);
@@ -126,7 +121,7 @@ exports.profile = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaite
         throw new error_handler_middleware_1.default('profile not found', 404);
     }
     res.status(200).json({
-        message: 'profile fetched',
+        mesage: 'profile fetched',
         data: user,
         success: true,
         status: 'success'
