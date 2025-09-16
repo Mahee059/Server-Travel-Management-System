@@ -75,12 +75,6 @@ export const login = asyncHandler(
     };
 
 
-
-  
-
-
-
-
     //! generate token
     const token = generateToken(payload);
     // await sendMail({
