@@ -8,7 +8,7 @@ import { sendMail } from "../utils/nodemailer.utils";
 
 export const book = asyncHandler(async (req: Request, res: Response) => {
   console.log('called')
-  const { tour_package, total_person } = req.body;
+  const { tour_package, total_person,phone } = req.body;
 
   const user = req.user._id;
   console.log('user')
@@ -37,6 +37,7 @@ export const book = asyncHandler(async (req: Request, res: Response) => {
     total_person,
     tour_package: tourPackage._id,
     user,
+    phone
   });
 
   if (tourPackage.cost_type === Package_Charge.PER_PERSON) {

@@ -21,7 +21,7 @@ const enum_types_1 = require("../types/enum.types");
 const nodemailer_utils_1 = require("../utils/nodemailer.utils");
 exports.book = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log('called');
-    const { tour_package, total_person } = req.body;
+    const { tour_package, total_person, phone } = req.body;
     const user = req.user._id;
     console.log('user');
     let total_cost;
@@ -41,6 +41,7 @@ exports.book = (0, async_handler_utils_1.asyncHandler)((req, res) => __awaiter(v
         total_person,
         tour_package: tourPackage._id,
         user,
+        phone
     });
     if (tourPackage.cost_type === enum_types_1.Package_Charge.PER_PERSON) {
         total_cost = Number(total_person) * Number(tourPackage === null || tourPackage === void 0 ? void 0 : tourPackage.total_charge);
