@@ -10,7 +10,8 @@ import CustomError, { errorHandler } from './middlewares/error-handler.middlewar
 import authRoutes from './routes/auth.routes'
 import userRoutes from './routes/user.routes'
 import PackageRoutes from './routes/tour_package.routes'
-import bookingRoutes from'./routes/booking.routes'
+import bookingRoutes from './routes/booking.routes'
+import adminDashboardRoutes from './routes/adminDashboard.routes'
 import helmet from 'helmet'
 
 const PORT = process.env.PORT || 8080
@@ -55,7 +56,8 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/booking', bookingRoutes);
-app.use('/api/tour_package', PackageRoutes);
+app.use('/api/tour_package', PackageRoutes)
+app.use ('/api/adminDashboard',adminDashboardRoutes)
 
  
 //fallback route
